@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vroom 3000™ System Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --or:#FF6B35;--or-dk:#C94E1E;--or-glow:rgba(255,107,53,.5);--or-dim:rgba(255,107,53,.12);
+  --navy:#07101e;--navy2:#0d1829;--card:#101c2e;--raised:#162540;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);--b3:rgba(255,255,255,.18);
+  --green:#00E5A0;--green-dim:rgba(0,229,160,.1);--green-glow:rgba(0,229,160,.4);
+  --yellow:#FFD166;--blue:#4A7FE8;--blue-dim:rgba(74,127,232,.14);
+  --red:#FF4757;--red-dim:rgba(255,71,87,.12);
+  --t1:#EDF2F7;--t2:#8AAEC8;--t3:#3D5A7A;
+  --disp:'Rajdhani',sans-serif;--mono:'Share Tech Mono',monospace;--body:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--body);background:var(--navy);color:var(--t1);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(255,107,53,.05) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;z-index:0}
+
+.app{position:relative;z-index:1;display:grid;grid-template-columns:340px 1fr;grid-template-rows:56px 1fr;min-height:100vh}
+
+/* HEADER */
+.hdr{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 1.2rem;
+  background:rgba(7,16,30,.97);border-bottom:1px solid var(--b2);backdrop-filter:blur(20px);z-index:50}
+.hdr-l{display:flex;align-items:center;gap:12px}
+.hdr-logo img{height:34px;width:auto}
+.hdr-title{font-family:var(--disp);font-size:14px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  background:linear-gradient(135deg,var(--or),#ffaa7d);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr-sub{font-family:var(--mono);font-size:8px;color:var(--t3);letter-spacing:.12em;margin-top:1px}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.spill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-family:var(--disp);
+  font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:all .3s}
+.spill.solar{background:var(--or-dim);border:1px solid rgba(255,107,53,.3);color:var(--or)}
+.spill.backup{background:var(--blue-dim);border:1px solid rgba(74,127,232,.3);color:var(--blue)}
+.spill.night{background:rgba(74,127,232,.08);border:1px solid rgba(74,127,232,.2);color:#94a3b8}
+.spill.off{background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t3)}
+.sdot{width:7px;height:7px;border-radius:50%;animation:blink 2s infinite}
+.spill.solar .sdot{background:var(--or)}.spill.backup .sdot{background:var(--blue)}
+.spill.night .sdot{background:#94a3b8;animation:none}.spill.off .sdot{background:var(--t3);animation:none}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* SIDEBAR */
+.sidebar{overflow-y:auto;background:var(--navy2);border-right:1px solid var(--b2);padding:.85rem;display:flex;flex-direction:column;gap:.65rem}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--raised);border-radius:2px}
+.sh{font-family:var(--disp);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--t3);
+  margin-bottom:.45rem;padding:0 2px;display:flex;align-items:center;gap:5px}
+.sh::after{content:'';flex:1;height:1px;background:var(--b1)}
+.ccard{background:var(--card);border:1px solid var(--b2);border-radius:11px;padding:.75rem}
+.clbl{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:.45rem;display:flex;align-items:center;gap:5px}
+select,input[type=range],input[type=number]{background:var(--raised);border:1px solid var(--b2);color:var(--t1);
+  border-radius:6px;font-family:var(--body);font-size:11px;padding:4px 7px;width:100%;outline:none;transition:border .2s}
+select:focus,input:focus{border-color:var(--or)}
+select option{background:var(--navy2)}
+input[type=range]{-webkit-appearance:none;height:4px;background:var(--b2);border:none;cursor:pointer;padding:0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--or);cursor:pointer;box-shadow:0 0 5px var(--or-glow)}
+.rrow{display:flex;flex-direction:column;gap:3px;margin-bottom:.45rem}
+.rrow:last-child{margin-bottom:0}
+.rlbl{display:flex;justify-content:space-between;font-size:10px;color:var(--t2)}
+.rval{font-family:var(--mono);color:var(--or);font-size:10px}
+.tr{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--b1)}
+.tr:last-child{border-bottom:none}
+.tl{font-size:11px;color:var(--t1)}.ts{font-size:9px;color:var(--t3);margin-top:1px}
+.tog{position:relative;width:36px;height:20px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tsl{position:absolute;cursor:pointer;inset:0;background:var(--raised);border:1px solid var(--b2);border-radius:20px;transition:.22s}
+.tsl::before{content:'';position:absolute;height:14px;width:14px;left:2px;top:2px;border-radius:50%;background:var(--t3);transition:.22s}
+.tog input:checked+.tsl{background:var(--or);border-color:var(--or-dk)}
+.tog input:checked+.tsl::before{transform:translateX(16px);background:white}
+
+/* ── OUTLET PANELS ── */
+.outlet-panel{background:var(--card);border:1px solid var(--b2);border-radius:11px;overflow:hidden;margin-bottom:6px}
+.outlet-panel:last-child{margin-bottom:0}
+.op-hdr{display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;user-select:none;
+  border-bottom:1px solid var(--b1);transition:background .2s}
+.op-hdr:hover{background:var(--raised)}
+.op-led{width:10px;height:10px;border-radius:50%;flex-shrink:0;transition:all .3s}
+.op-led.solar{background:var(--or);box-shadow:0 0 7px var(--or-glow);animation:lpulse 2s infinite}
+.op-led.backup{background:var(--green);box-shadow:0 0 7px var(--green-glow)}
+.op-led.wait{background:var(--or);animation:lflash .7s infinite}
+.op-led.off{background:var(--t3)}
+@keyframes lpulse{0%,100%{opacity:.9}50%{opacity:.5}}
+@keyframes lflash{0%,100%{opacity:1}50%{opacity:.1}}
+.op-title{font-family:var(--disp);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;flex:1}
+.op-p1 .op-title{color:#00E5A0}.op-p2 .op-title{color:var(--or)}.op-p3 .op-title{color:var(--yellow)}.op-p4 .op-title{color:var(--red)}
+.op-total{font-family:var(--mono);font-size:10px;color:var(--t3)}
+.op-chevron{font-size:10px;color:var(--t3);transition:transform .2s}
+.op-chevron.open{transform:rotate(180deg)}
+.op-body{display:none;padding:8px 10px}
+.op-body.open{display:block}
+/* Add load dropdown */
+.add-row{display:flex;gap:5px;margin-bottom:6px}
+.add-sel{flex:1;background:var(--raised);border:1px solid var(--b2);color:var(--t1);
+  border-radius:6px;font-size:11px;padding:4px 7px;outline:none;font-family:var(--body);cursor:pointer}
+.add-sel:focus{border-color:var(--or)}
+.add-btn{background:var(--or);border:none;border-radius:6px;color:white;padding:4px 10px;cursor:pointer;
+  font-family:var(--disp);font-size:10px;font-weight:700;letter-spacing:.05em;white-space:nowrap;transition:background .2s}
+.add-btn:hover{background:var(--or-dk)}
+/* Load tags */
+.load-tags{display:flex;flex-direction:column;gap:4px}
+.ltag{display:flex;align-items:center;gap:6px;padding:5px 7px;background:var(--raised);border:1px solid var(--b1);
+  border-radius:6px;font-size:10px}
+.ltag-icon{font-size:13px;flex-shrink:0}
+.ltag-name{flex:1;font-weight:500;color:var(--t1)}
+.ltag-watts{font-family:var(--mono);font-size:9px;color:var(--t2)}
+.ltag-rm{background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:0 2px;line-height:1;
+  transition:color .2s;flex-shrink:0}
+.ltag-rm:hover{color:var(--red)}
+.op-empty{font-size:10px;color:var(--t3);text-align:center;padding:6px 0;font-style:italic}
+
+/* Analysis */
+.wbox{border-radius:7px;padding:7px 9px;font-size:10.5px;line-height:1.5;display:none}
+.wbox.vis{display:block}
+.wbox.warn{background:var(--red-dim);border:1px solid rgba(255,71,87,.3);color:var(--red)}
+.wbox.ok{background:var(--green-dim);border:1px solid rgba(0,229,160,.2);color:var(--green)}
+.wbox.info{background:var(--blue-dim);border:1px solid rgba(74,127,232,.2);color:var(--blue)}
+.agrid{margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.atile{background:var(--raised);border-radius:7px;padding:7px;text-align:center}
+.atv{font-family:var(--mono);font-size:1rem;color:var(--or);display:block;line-height:1}
+.atv.gr{color:var(--green)}.atl{font-family:var(--disp);font-size:7.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);display:block;margin-top:2px}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;overflow:hidden}
+.darea{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:.75rem}
+#svg{width:100%;height:100%;max-width:760px;max-height:650px}
+
+/* BOTTOM */
+.bot{background:var(--navy2);border-top:1px solid var(--b2);padding:.6rem 1.2rem;display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem}
+.btile{text-align:center}
+.bv{font-family:var(--mono);font-size:1.1rem;color:var(--or);display:block;line-height:1;transition:color .3s}
+.bv.gr{color:var(--green)}.bv.rd{color:var(--red)}.bv.bl{color:var(--blue)}
+.bl2{font-family:var(--disp);font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-top:2px;display:block}
+.tcrl{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:.25rem 0 0}
+.tlbl{font-family:var(--mono);font-size:9px;color:var(--t3);min-width:56px}
+.tval{font-family:var(--mono);font-size:10px;color:var(--or);min-width:52px;text-align:right}
+.pbtn{background:var(--or);border:none;border-radius:6px;color:white;padding:4px 11px;cursor:pointer;
+  font-family:var(--disp);font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;transition:background .2s;flex-shrink:0}
+.pbtn:hover{background:var(--or-dk)}
+.sbtn{background:var(--raised);border:1px solid var(--b2);border-radius:6px;color:var(--t2);padding:3px 7px;cursor:pointer;
+  font-family:var(--mono);font-size:8px;transition:all .2s;flex-shrink:0}
+.sbtn.on{border-color:var(--or);color:var(--or)}
+
+/* SVG classes */
+.fline{stroke-dasharray:9 5;stroke-linecap:round;fill:none;stroke-width:2.5;opacity:0;transition:opacity .4s}
+.fline.on{opacity:1}
+.obox{fill:var(--card);stroke:var(--b2);stroke-width:1.5;transition:all .4s}
+.obox.sol{stroke:#FF6B35;fill:rgba(255,107,53,.1)}
+.obox.bkp{stroke:#4A7FE8;fill:rgba(74,127,232,.1)}
+.obox.wait{stroke:#FF6B35;fill:none;animation:wflash .8s infinite}
+.obox.off{opacity:.25}
+@keyframes wflash{0%,100%{opacity:.85}50%{opacity:.2}}
+.legend{position:absolute;bottom:10px;left:10px;display:flex;gap:8px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:8px;color:var(--t3)}
+.ld{width:18px;height:3px;border-radius:2px}
+
+/* ═══ MOBILE / PHONE RESPONSIVE ═══════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Stack layout vertically on phone */
+  .app {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 56px auto 1fr auto !important;
+    min-height: 100vh;
+  }
+  /* Sidebar full width, scrollable, max height */
+  .sidebar {
+    grid-column: 1;
+    max-height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid var(--b2);
+  }
+  .main { grid-column: 1; }
+  /* Diagram area — fill available space */
+  .darea { padding: .4rem; min-height: 300px; }
+  #svg { max-width: 100%; max-height: 320px; }
+  /* Bottom stats — 3 columns on small */
+  .bot { grid-template-columns: repeat(3,1fr); padding: .5rem .8rem; gap: .5rem; }
+  .bv { font-size: .9rem; }
+  .tcrl { gap: 5px; flex-wrap: wrap; }
+  #tsl { min-width: 0; width: 100%; order: -1; flex-basis: 100%; }
+  .tlbl { display: none; }
+  /* Sidebar typography tighter */
+  .ccard { padding: .55rem; }
+  .sh { font-size: 9px; }
+  .outlet-panel .op-hdr { padding: 7px 8px; }
+  .op-title { font-size: 10.5px; }
+  /* Header compact */
+  .hdr { padding: 0 .8rem; }
+  .hdr-sub { display: none; }
+  .hdr-title { font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  /* Very small phones */
+  .app { grid-template-rows: 52px auto 1fr auto !important; }
+  .sidebar { max-height: 48vh; }
+  .darea { min-height: 260px; }
+  #svg { max-height: 275px; }
+  .bot { grid-template-columns: repeat(2,1fr); }
+  .sbtn { display: none; }
+  .hdr-logo img { height: 24px; }
+  .hdr-title { font-size: 11px; }
+  /* Outlet panels compact */
+  .op-title { font-size: 9.5px; letter-spacing: 0; }
+  .add-btn { padding: 4px 7px; font-size: 9px; }
+  /* Analysis grid 1 col */
+  .agrid { grid-template-columns: 1fr 1fr; }
+  .atv { font-size: .85rem; }
+}
+
+/* Touch-friendly controls */
+@media (hover: none) and (pointer: coarse) {
+  .add-btn { min-height: 36px; }
+  .ltag-rm { min-width: 28px; min-height: 28px; font-size: 15px; }
+  .tog { width: 42px; height: 24px; }
+  .tsl::-webkit-slider-thumb { width: 20px; height: 20px; }
+  input[type=range]::-webkit-slider-thumb { width: 18px; height: 18px; }
+  .pbtn { padding: 7px 14px; }
+  .sbtn { padding: 6px 10px; }
+  .op-hdr { min-height: 44px; }
+  select { min-height: 36px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-l">
+    <div class="hdr-logo"><img id="hdr-logo" src="data:image/png;base64,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" alt="Vroom Power"></div>
+    <div>
+      <div class="hdr-title">Vroom 3000™ System Designer</div>
+      <div class="hdr-sub">Configure · Simulate · See Your Power Flow</div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <div class="spill solar" id="mpill"><span class="sdot"></span><span id="mstt">Solar Active</span></div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--t3)" id="clk">--:--</div>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+
+  <!-- Solar Config -->
+  <div>
+    <div class="sh">☀ Solar Array</div>
+    <div class="ccard">
+      <div class="clbl">📍 Location</div>
+      <select id="loc" onchange="S.sunHrs=parseFloat(this.value);onCfg()">
+        <optgroup label="── United States ──">
+          <option value="5.5">Southwest USA (AZ,NV,NM) — 5.5 hrs</option>
+          <option value="4.8">Mountain West (CO,UT) — 4.8 hrs</option>
+          <option value="4.5" selected>Central/South (MO,AR,TX) — 4.5 hrs</option>
+          <option value="4.0">Southeast (GA,FL,SC) — 4.0 hrs</option>
+          <option value="3.8">Mid-Atlantic (VA,MD) — 3.8 hrs</option>
+          <option value="3.5">Northeast (NY,MA) — 3.5 hrs</option>
+          <option value="3.2">Northwest (OR,WA) — 3.2 hrs</option>
+          <option value="3.0">Great Lakes (MI,OH) — 3.0 hrs</option>
+        </optgroup>
+        <optgroup label="── Caribbean ──">
+          <option value="6.5">Puerto Rico — 6.5 hrs</option>
+          <option value="6.4">Dominican Republic — 6.4 hrs</option>
+          <option value="6.5">Bahamas — 6.5 hrs</option>
+          <option value="6.2">Jamaica — 6.2 hrs</option>
+        </optgroup>
+        <optgroup label="── Central America ──">
+          <option value="5.8">Mexico — 5.8 hrs</option>
+          <option value="5.5">Guatemala — 5.5 hrs</option>
+          <option value="5.2">Costa Rica — 5.2 hrs</option>
+        </optgroup>
+        <optgroup label="── Canada ──">
+          <option value="4.5">Alberta — 4.5 hrs</option>
+          <option value="4.3">Ontario — 4.3 hrs</option>
+          <option value="4.0">Quebec — 4.0 hrs</option>
+        </optgroup>
+      </select>
+      <div class="rrow" style="margin-top:8px">
+        <div class="rlbl"><span>Array Size</span><span class="rval" id="szlbl">3.0 kW</span></div>
+        <input type="range" id="solar-sz" min="1" max="11" step="0.5" value="3" oninput="onSolar(this.value)">
+      </div>
+      <div style="font-family:var(--mono);font-size:8.5px;color:var(--t3);margin-top:3px">
+        ~<span id="pcnt">7</span>× 440W panels · Max 11 kW · 200-300 VDC
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 OUTLET DROPDOWNS -->
+  <div>
+    <div class="sh">🔌 Outlets — Add Loads</div>
+    <div style="font-size:10px;color:var(--t3);margin-bottom:6px;line-height:1.5;padding:0 2px">
+      <b style="color:var(--green)">With backup:</b> VS3000 optimizes solar use — switches loads to backup to maximize solar efficiency. No fixed priority.<br>
+      <b style="color:var(--or)">Without backup:</b> sheds Outlet 4 first → 3 → 2 → 1 as solar drops.
+    </div>
+    <div id="outlet-panels"></div>
+  </div>
+
+  <!-- Backup Sources -->
+  <div>
+    <div class="sh">⚡ Backup Sources</div>
+    <div class="ccard">
+      <div class="tr">
+        <div><div class="tl">UPS / Battery</div><div class="ts">Charges via Outlet 4 top socket</div></div>
+        <label class="tog"><input type="checkbox" id="hu" onchange="onBackup('ups',this.checked)"><span class="tsl"></span></label>
+      </div>
+      <div id="ups-d" style="display:none;padding-top:6px">
+        <div class="rrow">
+          <div class="rlbl"><span>Capacity</span><span class="rval" id="uv">3.0 kWh</span></div>
+          <input type="range" id="usz" min="1" max="15" step="0.5" value="3" oninput="S.upsKwh=parseFloat(this.value);document.getElementById('uv').textContent=this.value+' kWh';document.getElementById('ups-kwh').textContent=this.value+' kWh';onCfg()">
+        </div>
+        <div class="rrow" style="margin-top:4px">
+          <div class="rlbl"><span>Charge Rate</span><span class="rval" id="ucrv">400 W</span></div>
+          <select id="ucr" onchange="S.upsChargeW=parseInt(this.value);document.getElementById('ucrv').textContent=this.value+' W';onCfg()" style="margin-top:3px">
+            <option value="200">200W — slow charge</option>
+            <option value="400" selected>400W — standard</option>
+            <option value="600">600W — fast</option>
+            <option value="800">800W — high</option>
+            <option value="1000">1000W — rapid</option>
+            <option value="1200">1200W — max</option>
+          </select>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--t3);margin-top:3px" id="ucr-time">Full charge: ~7.5 hrs</div>
+        </div>
+      </div>
+      <div class="tr" style="margin-top:3px">
+        <div><div class="tl">Generator (2-wire)</div><div class="ts">Auto-dispatch on solar drop</div></div>
+        <label class="tog"><input type="checkbox" id="hg" onchange="onBackup('gen',this.checked)"><span class="tsl"></span></label>
+      </div>
+      <div id="gen-d" style="display:none;padding-top:6px">
+        <div class="rrow">
+          <div class="rlbl"><span>Generator Size</span><span class="rval" id="gv">5.0 kW</span></div>
+          <input type="range" id="gsz" min="2" max="15" step="0.5" value="5" oninput="S.genKw=parseFloat(this.value);document.getElementById('gv').textContent=this.value+' kW';document.getElementById('gen-kw').textContent=this.value+' kW';onCfg()">
+        </div>
+      </div>
+      <div class="tr" style="margin-top:3px">
+        <div><div class="tl">Grid (30A L5-30P)</div><div class="ts">Supplemental AC input</div></div>
+        <label class="tog"><input type="checkbox" id="hgr" onchange="onBackup('grid',this.checked)"><span class="tsl"></span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analysis -->
+  <div>
+    <div class="sh">📊 System Analysis</div>
+    <div class="ccard">
+      <div class="wbox warn" id="w1" style="margin-bottom:5px"></div>
+      <div class="wbox warn" id="w2" style="margin-bottom:5px"></div>
+      <div class="wbox ok vis" id="wok">Select loads to see analysis.</div>
+      <div class="agrid">
+        <div class="atile"><span class="atv" id="a-pk">0.0</span><span class="atl">Peak Solar kW</span></div>
+        <div class="atile"><span class="atv" id="a-ld">0</span><span class="atl">Total Load W</span></div>
+        <div class="atile"><span class="atv gr" id="a-kw">0.0</span><span class="atl">Daily kWh</span></div>
+        <div class="atile"><span class="atv gr" id="a-sv">$0</span><span class="atl">vs Gas/Year</span></div>
+      </div>
+    </div>
+  </div>
+
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="darea">
+    <svg id="svg" viewBox="0 0 780 640" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="sg" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#FFE566"/><stop offset="100%" stop-color="#FFD166"/>
+        </radialGradient>
+        <filter id="fo"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="fg"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <marker id="ao" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#FF6B35"/></marker>
+        <marker id="ab" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#4A7FE8"/></marker>
+        <marker id="ay" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#FFD166"/></marker>
+        <marker id="ag" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#8AAEC8"/></marker>
+        <style>
+          .flow{animation:flowD 1.1s linear infinite}
+          .flow-slow{animation:flowD 2.6s linear infinite}
+          @keyframes flowD{to{stroke-dashoffset:-28}}
+          .sun-pulse{animation:spulse 2.8s ease-in-out infinite}
+          @keyframes spulse{0%,100%{opacity:.85}50%{opacity:1}}
+          .led-solar{animation:lpulse 1.8s ease-in-out infinite}
+          @keyframes lpulse{0%,100%{opacity:.9}50%{opacity:.4}}
+          .led-flash{animation:lflash .65s infinite}
+          @keyframes lflash{0%,100%{opacity:1}50%{opacity:0}}
+          .wbox-anim{animation:wflash .8s infinite}
+          @keyframes wflash{0%,100%{opacity:.9}50%{opacity:.2}}
+        </style>
+      </defs>
+
+      <!-- Orbit ellipse -->
+      <ellipse cx="400" cy="310" rx="340" ry="275" fill="none" stroke="rgba(255,255,255,.035)" stroke-width="1" stroke-dasharray="4 7"/>
+
+      <!-- Time labels -->
+      <text x="400" y="26" text-anchor="middle" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" fill="#3D5A7A" letter-spacing="3">DAWN</text>
+      <text x="752" y="315" text-anchor="start" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" fill="#3D5A7A" letter-spacing="3">NOON</text>
+      <text x="400" y="598" text-anchor="middle" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" fill="#3D5A7A" letter-spacing="3">DUSK</text>
+      <text x="48" y="315" text-anchor="end" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" fill="#3D5A7A" letter-spacing="3">MIDNIGHT</text>
+
+      <!-- SUN -->
+      <g id="sun-grp">
+        <g class="sun-pulse" id="sun-rays">
+          <line x1="0" y1="-28" x2="0" y2="-40" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="20" y1="-20" x2="28" y2="-28" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="28" y1="0" x2="40" y2="0" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="20" y1="20" x2="28" y2="28" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="0" y1="28" x2="0" y2="40" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="-20" y1="20" x2="-28" y2="28" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="-28" y1="0" x2="-40" y2="0" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="-20" y1="-20" x2="-28" y2="-28" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+        <circle id="sun-circ" r="18" fill="url(#sg)" filter="url(#fo)"/>
+        <circle r="5" fill="#C8A000" opacity=".5"/>
+        <text id="sun-wlbl" text-anchor="middle" y="40" font-family="Rajdhani,sans-serif" font-size="15" font-weight="700" fill="#FFD166" filter="url(#fo)" letter-spacing="1"></text>
+      </g>
+
+      <!-- MOON — full orbit, opposite side of sun -->
+      <g id="moon-grp">
+        <!-- Moon crescent shape -->
+        <circle r="17" fill="#1a2d44" filter="url(#fg)"/>
+        <circle cx="7" cy="-4" r="13" fill="#07101e"/>
+        <!-- Stars -->
+        <circle cx="-26" cy="-14" r="1.5" fill="#8AAEC8" opacity=".7"/>
+        <circle cx="28" cy="8" r="1.2" fill="#8AAEC8" opacity=".5"/>
+        <circle cx="-18" cy="22" r="1" fill="#8AAEC8" opacity=".45"/>
+        <circle cx="15" cy="-22" r="1" fill="#8AAEC8" opacity=".4"/>
+        <text text-anchor="middle" y="32" font-family="Rajdhani,sans-serif" font-size="8" font-weight="700" fill="#4A5568" letter-spacing="1">NIGHT</text>
+      </g>
+
+      <!-- SOLAR PANEL -->
+      <g id="panel-grp" transform="translate(572,238)">
+        <rect x="-54" y="-65" width="108" height="130" rx="5" fill="#0a1525" stroke="#2E4A6A" stroke-width="1.5"/>
+        <g stroke="#1a3050" stroke-width=".8">
+          <line x1="-54" y1="-22" x2="54" y2="-22"/>
+          <line x1="-54" y1="21" x2="54" y2="21"/>
+          <line x1="-54" y1="65" x2="54" y2="65"/>
+          <line x1="-18" y1="-65" x2="-18" y2="65"/>
+          <line x1="18" y1="-65" x2="18" y2="65"/>
+        </g>
+        <rect x="-52" y="-63" width="104" height="126" rx="4" id="panel-fill" fill="rgba(255,107,53,.04)"/>
+        <text text-anchor="middle" y="84" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="2" fill="#3D5A7A">SOLAR ARRAY</text>
+        <text text-anchor="middle" y="97" font-family="Share Tech Mono,monospace" font-size="9" fill="#FF6B35" id="panel-lbl">3.0 kW</text>
+        <g id="sray-grp" opacity="0">
+          <line x1="-28" y1="-38" x2="-55" y2="-70" stroke="#FFD166" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>
+          <line x1="0" y1="-65" x2="0" y2="-92" stroke="#FFD166" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>
+          <line x1="28" y1="-38" x2="55" y2="-70" stroke="#FFD166" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>
+        </g>
+      </g>
+
+      <!-- VS3000 UNIT — taller to fit all 4 outlets properly -->
+      <!-- Center X=360, center Y=295, height=240 -->
+      <g id="vs3k" transform="translate(370,295)">
+        <!-- Body -->
+        <rect x="-80" y="-128" width="160" height="285" rx="10" fill="#0F1F38" stroke="#FF6B35" stroke-width="2.5" filter="url(#fo)"/>
+        <!-- Header bar -->
+        <rect x="-78" y="-126" width="156" height="28" rx="7" fill="#0d1829"/>
+        <text text-anchor="middle" y="-106" font-family="Rajdhani,sans-serif" font-size="16" font-weight="800" letter-spacing="3" fill="#FF6B35">VROOM 3000</text>
+
+        <!-- SOLAR FUEL GAUGE — 5 vertical LEDs, left side -->
+        <text x="-68" y="-74" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="6" fill="#3D5A7A">FUEL</text>
+        <g id="fuel-gauge">
+          <circle id="fg5" cx="-68" cy="-62" r="4.5" fill="#0d1829"/>
+          <circle id="fg4" cx="-68" cy="-47" r="4.5" fill="#0d1829"/>
+          <circle id="fg3" cx="-68" cy="-32" r="4.5" fill="#0d1829"/>
+          <circle id="fg2" cx="-68" cy="-17" r="4.5" fill="#0d1829"/>
+          <circle id="fg1" cx="-68" cy="-2"  r="4.5" fill="#0d1829"/>
+        </g>
+
+        <!-- Power LED -->
+        <circle id="pwr-led" cx="62" cy="-108" r="5.5" fill="#1a2a3a"/>
+
+        <!-- OUTLET 1 — y=-76, center=-55 -->
+        <g id="rec1">
+          <rect x="-54" y="-76" width="108" height="42" rx="5" fill="#0a1525" stroke="#0d2a1a" stroke-width="1.2" id="slot1-bg"/>
+          <text x="-50" y="-61" font-family="Rajdhani,sans-serif" font-size="13" font-weight="800" fill="#00E5A0">OUTLET 1</text>
+          <text text-anchor="start" x="-50" y="-46" font-family="Share Tech Mono,monospace" font-size="7" fill="#4A7FE8" id="s1load">—</text>
+          <circle id="led1" cx="8" cy="-55" r="5" fill="#1a2a3a"/>
+          <g transform="translate(35,-55)">
+            <rect x="-14" y="-17" width="28" height="34" rx="4" fill="#0c1a2e" stroke="#00E5A0" stroke-width="1.5"/>
+            <rect x="-8" y="-11" width="4" height="9" rx="1.5" fill="#00E5A0" opacity=".8"/>
+            <rect x="4"  y="-12" width="4" height="10" rx="1.5" fill="#00E5A0" opacity=".8"/>
+            <path d="M -3.5,3 A 3.5,4 0 0,0 3.5,3 L 3,12 A 3,4 0 0,1 -3,12 Z" fill="#00E5A0" opacity=".65"/>
+          </g>
+        </g>
+
+        <!-- OUTLET 2 — y=-22, center=-1 -->
+        <g id="rec2">
+          <rect x="-54" y="-22" width="108" height="42" rx="5" fill="#0a1525" stroke="#2a1a0a" stroke-width="1.2" id="slot2-bg"/>
+          <text x="-50" y="-7" font-family="Rajdhani,sans-serif" font-size="13" font-weight="800" fill="#FF6B35">OUTLET 2</text>
+          <text text-anchor="start" x="-50" y="8" font-family="Share Tech Mono,monospace" font-size="7" fill="#4A7FE8" id="s2load">—</text>
+          <circle id="led2" cx="8" cy="-1" r="5" fill="#1a2a3a"/>
+          <g transform="translate(35,-1)">
+            <rect x="-14" y="-17" width="28" height="34" rx="4" fill="#0c1a2e" stroke="#FF6B35" stroke-width="1.5"/>
+            <rect x="-8" y="-11" width="4" height="9" rx="1.5" fill="#FF6B35" opacity=".8"/>
+            <rect x="4"  y="-12" width="4" height="10" rx="1.5" fill="#FF6B35" opacity=".8"/>
+            <path d="M -3.5,3 A 3.5,4 0 0,0 3.5,3 L 3,12 A 3,4 0 0,1 -3,12 Z" fill="#FF6B35" opacity=".65"/>
+          </g>
+        </g>
+
+        <!-- OUTLET 3 — y=26, center=47 -->
+        <g id="rec3">
+          <rect x="-54" y="26" width="108" height="42" rx="5" fill="#0a1525" stroke="#2a260a" stroke-width="1.2" id="slot3-bg"/>
+          <text x="-50" y="41" font-family="Rajdhani,sans-serif" font-size="13" font-weight="800" fill="#FFD166">OUTLET 3</text>
+          <text text-anchor="start" x="-50" y="56" font-family="Share Tech Mono,monospace" font-size="7" fill="#4A7FE8" id="s3load">—</text>
+          <circle id="led3" cx="8" cy="47" r="5" fill="#1a2a3a"/>
+          <g transform="translate(35,47)">
+            <rect x="-14" y="-17" width="28" height="34" rx="4" fill="#0c1a2e" stroke="#FFD166" stroke-width="1.5"/>
+            <rect x="-8" y="-11" width="4" height="9" rx="1.5" fill="#FFD166" opacity=".8"/>
+            <rect x="4"  y="-12" width="4" height="10" rx="1.5" fill="#FFD166" opacity=".8"/>
+            <path d="M -3.5,3 A 3.5,4 0 0,0 3.5,3 L 3,12 A 3,4 0 0,1 -3,12 Z" fill="#FFD166" opacity=".65"/>
+          </g>
+        </g>
+
+        <!-- OUTLET 4 — y=76, center=97 -->
+        <g id="rec4">
+          <rect x="-54" y="76" width="108" height="42" rx="5" fill="#0a1525" stroke="#2a0a0a" stroke-width="1.2" id="slot4-bg"/>
+          <text x="-50" y="91" font-family="Rajdhani,sans-serif" font-size="13" font-weight="800" fill="#FF4757">OUTLET 4</text>
+          <text text-anchor="start" x="-50" y="106" font-family="Share Tech Mono,monospace" font-size="7" fill="#4A7FE8" id="s4load">—</text>
+          <circle id="led4" cx="8" cy="97" r="5" fill="#1a2a3a"/>
+          <g transform="translate(35,97)">
+            <rect x="-14" y="-17" width="28" height="34" rx="4" fill="#0c1a2e" stroke="#FF4757" stroke-width="1.5"/>
+            <rect x="-8" y="-11" width="4" height="9" rx="1.5" fill="#FF4757" opacity=".8"/>
+            <rect x="4"  y="-12" width="4" height="10" rx="1.5" fill="#FF4757" opacity=".8"/>
+            <path d="M -3.5,3 A 3.5,4 0 0,0 3.5,3 L 3,12 A 3,4 0 0,1 -3,12 Z" fill="#FF4757" opacity=".65"/>
+          </g>
+        </g>
+
+        <!-- UPS charging port label -->
+        <text x="-50" y="127" font-family="Share Tech Mono,monospace" font-size="6" fill="#4A7FE8" id="ups-chg-lbl"></text>
+
+      </g>
+
+      <!-- BACKUP SOURCE NODES -->
+      <g id="ups-node" transform="translate(205,490)" style="display:none">
+        <rect x="-58" y="-32" width="116" height="64" rx="7" fill="#0F1F38" stroke="#4A7FE8" stroke-width="1.5"/>
+        <text text-anchor="middle" y="-12" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="2" fill="#4A7FE8">UPS / BATTERY</text>
+        <text text-anchor="middle" y="4" font-family="Share Tech Mono,monospace" font-size="9" fill="#4A7FE8" id="ups-pct">80%</text>
+        <rect x="-44" y="10" width="88" height="5" rx="2" fill="rgba(255,255,255,.06)"/>
+        <rect x="-44" y="10" width="70" height="5" rx="2" fill="#4A7FE8" id="ups-bar"/>
+        <text text-anchor="middle" y="25" font-family="Share Tech Mono,monospace" font-size="7.5" fill="#3D5A7A" id="ups-kwh">3.0 kWh</text>
+        <text text-anchor="middle" y="35" font-family="Share Tech Mono,monospace" font-size="7" fill="#4A7FE8" id="ups-mode-lbl"></text>
+      </g>
+      <g id="gen-node" transform="translate(360,510)" style="display:none">
+        <rect x="-50" y="-28" width="100" height="56" rx="7" fill="#0F1F38" stroke="#8AAEC8" stroke-width="1.5"/>
+        <text text-anchor="middle" y="-8" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="2" fill="#8AAEC8">GENERATOR</text>
+        <text text-anchor="middle" y="8" font-family="Share Tech Mono,monospace" font-size="9" fill="#8AAEC8" id="gen-kw">5.0 kW</text>
+        <text text-anchor="middle" y="22" font-family="Share Tech Mono,monospace" font-size="7.5" fill="#3D5A7A" id="gen-st">Standby</text>
+      </g>
+      <g id="grid-node" transform="translate(515,490)" style="display:none">
+        <rect x="-44" y="-28" width="88" height="56" rx="7" fill="#0F1F38" stroke="#FFD166" stroke-width="1.5"/>
+        <text text-anchor="middle" y="-8" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="2" fill="#FFD166">GRID</text>
+        <text text-anchor="middle" y="8" font-family="Share Tech Mono,monospace" font-size="9" fill="#FFD166">120VAC 30A</text>
+        <text text-anchor="middle" y="22" font-family="Share Tech Mono,monospace" font-size="7.5" fill="#3D5A7A" id="grid-st">Standby</text>
+      </g>
+
+      <!-- FLOW LINES -->
+      <!-- Solar panel → VS3000 -->
+      <path id="ln-solar" class="fline flow" stroke="#FF6B35" d="M 518,238 L 450,220" stroke-dasharray="9 5" marker-end="url(#ao)"/>
+      <!-- Backup → VS3000 AC INPUT (360,400) -->
+      <path id="ln-ups"  class="fline flow-slow" stroke="#4A7FE8"  d="M 250,462 L 348,425" stroke-dasharray="9 5" marker-end="url(#ab)"/>
+      <path id="ln-gen"  class="fline flow-slow" stroke="#8AAEC8"  d="M 370,484 L 370,425" stroke-dasharray="9 5" marker-end="url(#ag)"/>
+      <path id="ln-grid" class="fline flow-slow" stroke="#FFD166"  d="M 490,462 L 392,425" stroke-dasharray="9 5" marker-end="url(#ay)"/>
+      <!-- UPS charging from outlet 4 surplus -->
+      <path id="ln-chg"  class="fline flow-slow" stroke="#FF6B35"  d="M 290,375 Q 235,435 250,462" stroke-dasharray="6 4" stroke-width="1.5" marker-end="url(#ao)" opacity="0"/>
+
+      <!-- 4 OUTLET LINES — from specific outlet Y positions on VS3000 left edge (x=294) -->
+      <!-- Outlet 1 → y=225 (VS3000 y -70+295=225) -->
+      <path id="ol1" class="fline flow" stroke="#FF6B35" d="M 280,240 L 140,215" stroke-dasharray="9 5" marker-end="url(#ao)"/>
+      <!-- Outlet 2 → y=265 (-30+295) -->
+      <path id="ol2" class="fline flow" stroke="#FF6B35" d="M 280,294 L 140,279" stroke-dasharray="9 5" marker-end="url(#ao)"/>
+      <!-- Outlet 3 → y=305 (+10+295) -->
+      <path id="ol3" class="fline flow" stroke="#FF6B35" d="M 280,342 L 140,342" stroke-dasharray="9 5" marker-end="url(#ao)"/>
+      <!-- Outlet 4 → y=345 (+50+295) -->
+      <path id="ol4" class="fline flow" stroke="#FF6B35" d="M 280,392 L 140,400" stroke-dasharray="9 5" marker-end="url(#ao)"/>
+
+      <!-- LOAD BOXES (dynamic) -->
+      <g id="loads-grp"></g>
+
+      <!-- Efficiency badge -->
+      <g transform="translate(468,256)">
+        <rect x="-26" y="-9" width="52" height="18" rx="4" fill="rgba(255,107,53,.1)" stroke="rgba(255,107,53,.3)" stroke-width="1"/>
+        <text text-anchor="middle" y="4" font-family="Share Tech Mono,monospace" font-size="8.5" fill="#FF6B35" id="eff-lbl">98% eff</text>
+      </g>
+    </svg>
+
+    <div class="legend">
+      <div class="li"><div class="ld" style="background:#FF6B35"></div>Solar (Orange)</div>
+      <div class="li"><div class="ld" style="background:#00E5A0"></div>Backup (Green)</div>
+      <div class="li"><div class="ld" style="background:#4A7FE8"></div>Battery</div>
+      <div class="li"><div class="ld" style="background:#FFD166"></div>Grid</div>
+      <div class="li"><div class="ld" style="background:#FF6B35;opacity:.3"></div>Waiting / OFF</div>
+    </div>
+    <!-- Warning overlay banners on diagram -->
+    <div id="warn-overlay" style="position:absolute;top:10px;left:50%;transform:translateX(-50%);
+      display:flex;flex-direction:column;gap:6px;pointer-events:none;width:90%;max-width:460px;z-index:10">
+      <div id="wo1" style="display:none;background:rgba(255,71,87,.15);border:1.5px solid #FF4757;
+        border-radius:10px;padding:8px 14px;font-size:11px;color:#FF4757;line-height:1.5;
+        font-family:'Inter',sans-serif;text-align:center;backdrop-filter:blur(6px);
+        box-shadow:0 0 20px rgba(255,71,87,.25)"></div>
+      <div id="wo2" style="display:none;background:rgba(255,209,102,.1);border:1.5px solid #FFD166;
+        border-radius:10px;padding:8px 14px;font-size:11px;color:#FFD166;line-height:1.5;
+        font-family:'Inter',sans-serif;text-align:center;backdrop-filter:blur(6px);
+        box-shadow:0 0 16px rgba(255,209,102,.2)"></div>
+    </div>
+  </div>
+
+  <!-- Bottom panel -->
+  <div class="bot">
+    <div class="btile"><span class="bv" id="b-sol">0.0 kW</span><span class="bl2">Solar Output</span></div>
+    <div class="btile"><span class="bv" id="b-ld">0 W</span><span class="bl2">Load Now</span></div>
+    <div class="btile"><span class="bv gr" id="b-sur">0.0 kW</span><span class="bl2">Surplus</span></div>
+    <div class="btile"><span class="bv" id="b-src" style="font-size:.85rem">Solar</span><span class="bl2">Source</span></div>
+    <div class="btile"><span class="bv bl" id="b-bat">—</span><span class="bl2">Battery SOC</span></div>
+    <div class="tcrl">
+      <span class="tlbl">Time of Day</span>
+      <input type="range" id="tsl" min="0" max="1439" step="1" value="480" style="flex:1">
+      <span class="tval" id="tdsp">8:00 AM</span>
+      <button class="pbtn" id="pbtn" onclick="togglePlay()">▶ Play</button>
+      <button class="sbtn on" onclick="setSpd(1,this)">1×</button>
+      <button class="sbtn" onclick="setSpd(3,this)">3×</button>
+      <button class="sbtn" onclick="setSpd(8,this)">8×</button>
+    </div>
+  </div>
+</main>
+</div>
+
+<script>
+// ═══ LOGO ═══════════════════════════════════════════════
+// White logo embedded directly in HTML
+
+// ═══ EQUIPMENT CATALOG ══════════════════════════════════
+// Organized into dropdown categories per outlet
+const EQUIP = [
+  { group:'🔋 Battery Chargers', items:[
+    {id:'bc-sm-a',  name:'Small Battery Charger A',  w:300,  icon:'🔋', sch:[6,18]},
+    {id:'bc-sm-b',  name:'Small Battery Charger B',  w:300,  icon:'🔋', sch:[7,19]},
+    {id:'bc-sm-c',  name:'Small Battery Charger C',  w:300,  icon:'🔋', sch:[8,18]},
+    {id:'bc-med',   name:'Medium Battery Charger',   w:500,  icon:'⚡', sch:[6,16]},
+    {id:'bc-lg',    name:'Large Battery Charger',    w:800,  icon:'⚡', sch:[6,14]},
+    {id:'bc-bank1', name:'Battery Bank 1 kWh',       w:1000, icon:'🔌', sch:[6,12]},
+    {id:'bc-bank2', name:'Battery Bank 2 kWh',       w:1440, icon:'🔌', sch:[6,10]},
+    {id:'drone-2',  name:'Drone Chargers x2 (300W)', w:300,  icon:'🚁', sch:[7,17]},
+    {id:'drone-4',  name:'Drone Chargers x4 (600W)', w:600,  icon:'🚁', sch:[7,17]},
+    {id:'drone-6',  name:'Drone Chargers x6 (900W)', w:900,  icon:'🚁', sch:[7,17]},
+  ]},
+  { group:'🤖 Robot Mowers', items:[
+    {id:'rm-sm',   name:'Robot Mower Small (150W)',  w:150,  icon:'🤖', sch:[7,17]},
+    {id:'rm-med',  name:'Robot Mower Medium (300W)', w:300,  icon:'🤖', sch:[7,17]},
+    {id:'rm-lg',   name:'Robot Mower Large (500W)',  w:500,  icon:'🤖', sch:[6,18]},
+    {id:'rm-2x',   name:'2x Robot Mowers (600W)',    w:600,  icon:'🤖', sch:[7,17]},
+    {id:'rm-4x',   name:'4x Robot Mowers (1000W)',   w:1000, icon:'🤖', sch:[6,18]},
+  ]},
+  { group:'❄️ AC / Heating', items:[
+    {id:'ac-6k',    name:'AC Unit 6,000 BTU',        w:560,  icon:'❄️', sch:[8,20]},
+    {id:'ac-10k',   name:'AC Unit 10,000 BTU',       w:900,  icon:'❄️', sch:[8,20]},
+    {id:'ac-12k',   name:'AC Unit 12,000 BTU',       w:1100, icon:'❄️', sch:[8,20]},
+    {id:'heat-sm',  name:'Space Heater Small (750W)',  w:750,  icon:'🔥', sch:[18,24,0,8]},
+    {id:'heat-lg',  name:'Space Heater Large (1500W)', w:1500, icon:'🔥', sch:[18,24,0,8]},
+    {id:'heat-pump',name:'Mini-Split Heat Pump',      w:1200, icon:'🌡', sch:[0,24]},
+  ]},
+  { group:'💨 Fans & Ventilation', items:[
+    {id:'fan-sm',   name:'Fan Small 1/4HP (185W)',   w:185,  icon:'💨', sch:[6,20]},
+    {id:'fan-med',  name:'Fan Medium 1/3HP (250W)',  w:250,  icon:'💨', sch:[6,20]},
+    {id:'fan-lg',   name:'Fan Large 1/2HP (370W)',   w:370,  icon:'💨', sch:[6,20]},
+    {id:'fan-xl',   name:'Fan XL 1HP (750W)',        w:750,  icon:'💨', sch:[6,20]},
+  ]},
+  { group:'🌱 Greenhouse', items:[
+    {id:'gh-irr-sm',name:'Irrigation Pump Small',    w:250,  icon:'💧', sch:[6,9,16,18]},
+    {id:'gh-irr-lg',name:'Irrigation Pump Large',    w:500,  icon:'💧', sch:[6,9,16,18]},
+    {id:'gh-light', name:'Grow Lights (600W)',        w:600,  icon:'🌱', sch:[5,12]},
+    {id:'gh-cool',  name:'Produce Cooler (150W)',     w:150,  icon:'❄️', sch:[0,24]},
+    {id:'gh-heat',  name:'Heat Mat (250W)',           w:250,  icon:'🌡', sch:[18,24,0,6]},
+  ]},
+  { group:'🔧 Tools & Equipment', items:[
+    {id:'compressor',name:'Air Compressor (700W)',    w:700,  icon:'🛢', sch:[7,17]},
+    {id:'tools-sm',  name:'Power Tools Light (600W)', w:600,  icon:'🔧', sch:[8,16]},
+    {id:'tools-lg',  name:'Power Tools Heavy (1200W)',w:1200, icon:'🔧', sch:[8,16]},
+    {id:'welder',    name:'Welder 120V (1440W)',      w:1440, icon:'⚙️', sch:[8,16]},
+    {id:'ev-l1',     name:'EV Charge Level 1',        w:1440, icon:'🚗', sch:[9,15]},
+  ]},
+  { group:'💡 Lighting & Security', items:[
+    {id:'lights-sm', name:'Site Lighting Small',      w:100,  icon:'💡', sch:[0,7,17,24]},
+    {id:'lights-lg', name:'Site Lighting Large',      w:200,  icon:'💡', sch:[0,7,17,24]},
+    {id:'security',  name:'Security Cameras (60W)',   w:60,   icon:'📹', sch:[0,24]},
+    {id:'wifi',      name:'WiFi / Router (30W)',      w:30,   icon:'📶', sch:[0,24]},
+    {id:'laptop-2',  name:'Laptops x2 (120W)',        w:120,  icon:'💻', sch:[7,18]},
+  ]},
+];
+
+// Outlet assignments: outletLoads[1..4] = array of {id, customName?}
+const outletLoads = {1:[], 2:[], 3:[], 4:[]};
+
+// ═══ BUILD OUTLET PANELS ════════════════════════════════
+const OUTLET_COLORS = {1:'#00E5A0', 2:'#FF6B35', 3:'#FFD166', 4:'#FF4757'};
+const OUTLET_LABELS = {1:'Outlet 1 — Solar Optimized (Critical)', 2:'Outlet 2 — Solar Optimized', 3:'Outlet 3 — Solar Optimized', 4:'Outlet 4 — Solar Optimized (UPS Charge)'};
+
+function buildOutletPanels(){
+  const area = document.getElementById('outlet-panels');
+  area.innerHTML = '';
+  for(let o=1;o<=4;o++){
+    const panel = document.createElement('div');
+    panel.className = 'outlet-panel op-p'+o;
+    panel.id = 'op-'+o;
+
+    // Header
+    const hdr = document.createElement('div');
+    hdr.className = 'op-hdr';
+    hdr.innerHTML = `
+      <div class="op-led off" id="op-led-${o}"></div>
+      <div class="op-title">${OUTLET_LABELS[o]}</div>
+      <span class="op-total" id="op-w-${o}">0W</span>
+      <span class="op-chevron" id="op-chev-${o}">▼</span>`;
+    hdr.onclick = () => togglePanel(o);
+    panel.appendChild(hdr);
+
+    // Body
+    const body = document.createElement('div');
+    body.className = 'op-body'+(o<=2?' open':''); // open first 2 by default
+    body.id = 'op-body-'+o;
+
+    // Dropdown + add button
+    const addRow = document.createElement('div');
+    addRow.className = 'add-row';
+    const sel = document.createElement('select');
+    sel.className = 'add-sel';
+    sel.id = 'op-sel-'+o;
+    sel.innerHTML = '<option value="">— Click to add equipment —</option>';
+    EQUIP.forEach(cat => {
+      const og = document.createElement('optgroup');
+      og.label = cat.group;
+      cat.items.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.id;
+        opt.textContent = `${item.name} (${item.w}W)`;
+        og.appendChild(opt);
+      });
+      sel.appendChild(og);
+    });
+    const btn = document.createElement('button');
+    btn.className = 'add-btn';
+    btn.textContent = '+ Add';
+    btn.onclick = () => addToOutlet(o);
+    addRow.appendChild(sel);
+    addRow.appendChild(btn);
+    body.appendChild(addRow);
+
+    // Custom load row
+    const customRow = document.createElement('div');
+    customRow.style.cssText = 'display:flex;gap:5px;margin-bottom:6px;align-items:center';
+    const cnInput = document.createElement('input');
+    cnInput.type='text'; cnInput.id='cname-'+o; cnInput.placeholder='Custom load name';
+    cnInput.style.cssText='flex:1;background:#162540;border:1px solid rgba(255,255,255,.11);color:#EDF2F7;border-radius:6px;font-size:10px;padding:4px 6px;outline:none';
+    const cwInput = document.createElement('input');
+    cwInput.type='number'; cwInput.id='cwatts-'+o; cwInput.placeholder='Watts'; cwInput.min=1; cwInput.max=3000;
+    cwInput.style.cssText='width:62px;background:#162540;border:1px solid rgba(255,255,255,.11);color:#EDF2F7;border-radius:6px;font-size:10px;padding:4px 6px;outline:none';
+    const cbtn = document.createElement('button');
+    cbtn.textContent='+ Custom';
+    cbtn.style.cssText='padding:4px 8px;background:#162540;border:1px solid rgba(255,255,255,.11);color:#8AAEC8;border-radius:6px;cursor:pointer;font-size:9px;white-space:nowrap;font-weight:700';
+    const oCopy = o;
+    cbtn.onclick = () => addCustomToOutlet(oCopy);
+    customRow.appendChild(cnInput);
+    customRow.appendChild(cwInput);
+    customRow.appendChild(cbtn);
+    body.appendChild(customRow);
+
+    // Load tags container
+    const tags = document.createElement('div');
+    tags.className = 'load-tags';
+    tags.id = 'op-tags-'+o;
+    tags.innerHTML = '<div class="op-empty">No loads assigned. Add equipment above.</div>';
+    body.appendChild(tags);
+    panel.appendChild(body);
+    area.appendChild(panel);
+  }
+}
+
+function togglePanel(o){
+  const body = document.getElementById('op-body-'+o);
+  const chev = document.getElementById('op-chev-'+o);
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function addToOutlet(o){
+  const sel = document.getElementById('op-sel-'+o);
+  const id = sel.value;
+  if(!id) return;
+  // Find item
+  let item = null;
+  EQUIP.forEach(cat => { const f=cat.items.find(i=>i.id===id); if(f) item=f; });
+  if(!item) return;
+  // Check not already on this outlet
+  if(outletLoads[o].find(l=>l.id===id)) { sel.value=''; return; }
+  outletLoads[o].push({id, w:item.w, icon:item.icon, name:item.name, sch:item.sch});
+  sel.value = '';
+  renderOutletTags(o);
+  onCfg();
+}
+
+function addCustomToOutlet(o){
+  const nameEl=document.getElementById('cname-'+o);
+  const wattEl=document.getElementById('cwatts-'+o);
+  const name=(nameEl?nameEl.value.trim():'');
+  const watts=parseInt(wattEl?wattEl.value:0);
+  if(!name||!watts||watts<1) return;
+  const id='cust-'+Date.now();
+  outletLoads[o].push({id, w:watts, icon:'🔌', name, sch:[0,24]});
+  // Register in a custom catalog so getAllActive finds it
+  if(!window._customItems) window._customItems={};
+  window._customItems[id]={id, w:watts, icon:'🔌', name, sch:[0,24]};
+  if(nameEl) nameEl.value='';
+  if(wattEl) wattEl.value='';
+  renderOutletTags(o); onCfg();
+}
+
+function removeFromOutlet(o, id){
+  outletLoads[o] = outletLoads[o].filter(l=>l.id!==id);
+  renderOutletTags(o);
+  onCfg();
+}
+
+function renderOutletTags(o){
+  const tags = document.getElementById('op-tags-'+o);
+  tags.innerHTML = '';
+  if(outletLoads[o].length===0){
+    tags.innerHTML = '<div class="op-empty">No loads assigned.</div>';
+    return;
+  }
+  outletLoads[o].forEach(l=>{
+    const tag = document.createElement('div');
+    tag.className = 'ltag';
+    tag.id = 'ltag-'+l.id;
+    tag.innerHTML = `<span class="ltag-icon">${l.icon}</span><span class="ltag-name">${l.name}</span>
+      <span class="ltag-watts">${l.w}W</span>
+      <button class="ltag-rm" onclick="removeFromOutlet(${o},'${l.id}')" title="Remove">✕</button>`;
+    tags.appendChild(tag);
+  });
+  // Update watt total in header
+  const total = outletLoads[o].reduce((s,l)=>s+l.w,0);
+  document.getElementById('op-w-'+o).textContent = total > 0 ? total+'W' : '0W';
+}
+
+function updateOutletTotals(){
+  for(let o=1;o<=4;o++){
+    const total = outletLoads[o].reduce((s,l)=>s+l.w,0);
+    document.getElementById('op-w-'+o).textContent = total+'W';
+  }
+}
+
+// ═══ HELPERS ════════════════════════════════════════════
+function getAllActive(){
+  const all=[];
+  for(let o=1;o<=4;o++) outletLoads[o].forEach(l=>all.push({...l,outlet:o}));
+  return all;
+}
+function loadIsOn(l,t){
+  const h=t/60, s=l.sch;
+  if(s.length===2) return h>=s[0]&&h<s[1];
+  if(s.length===4) return (h>=s[0]&&h<s[1])||(h>=s[2]&&h<s[3]);
+  return false;
+}
+function getOutletW(o,t){ return outletLoads[o].filter(l=>loadIsOn(l,t)).reduce((s,l)=>s+l.w,0); }
+
+// ═══ SOLAR CURVE ════════════════════════════════════════
+function solarFrac(t){
+  const h=t/60;
+  if(h<6||h>20) return 0;
+  return Math.max(0,Math.exp(-0.5*((h-13)/3.2)**2));
+}
+function solarKw(t){ return S.solarKw*solarFrac(t); }
+
+// ═══ STATE ══════════════════════════════════════════════
+const S={solarKw:3,sunHrs:4.5,hasUPS:false,upsKwh:3,upsSoc:0.0,upsChargeW:400,hasGen:false,genKw:5,hasGrid:false,t:480,playing:false,speed:1};
+
+
+// ═══ CONFIG HANDLERS ════════════════════════════════════
+function onSolar(v){ S.solarKw=parseFloat(v); document.getElementById('szlbl').textContent=v+' kW';
+  document.getElementById('pcnt').textContent=Math.ceil(v/0.44); document.getElementById('panel-lbl').textContent=v+' kW'; onCfg(); }
+function onBackup(type,v){
+  if(type==='ups'){ S.hasUPS=v; document.getElementById('ups-d').style.display=v?'block':'none'; document.getElementById('ups-node').style.display=v?'block':'none'; }
+  if(type==='gen'){ S.hasGen=v; document.getElementById('gen-d').style.display=v?'block':'none'; document.getElementById('gen-node').style.display=v?'block':'none'; }
+  if(type==='grid'){ S.hasGrid=v; document.getElementById('grid-node').style.display=v?'block':'none'; }
+  onCfg();
+}
+function onCfg(){ updateAnalysis(); renderAllLoadBoxes(); tick(false); updateOutletTotals(); }
+
+// ═══ ANALYSIS ═══════════════════════════════════════════
+function updateAnalysis(){
+  const loads=getAllActive();
+  const totalW=loads.reduce((s,l)=>s+l.w,0);
+  const peakSol=S.solarKw*1000;
+  const daily=S.solarKw*S.sunHrs*0.8;
+  const yrSave=Math.round(daily*365*0.09*8);
+  document.getElementById('a-pk').textContent=S.solarKw.toFixed(1);
+  document.getElementById('a-ld').textContent=totalW.toLocaleString();
+  document.getElementById('a-kw').textContent=daily.toFixed(1);
+  document.getElementById('a-sv').textContent='$'+yrSave.toLocaleString();
+  const daytimeW=loads.filter(l=>loadIsOn(l,780)).reduce((s,l)=>s+l.w,0);
+  const w1=document.getElementById('w1'), w2=document.getElementById('w2'), wok=document.getElementById('wok');
+  w1.className='wbox'; w2.className='wbox'; wok.className='wbox';
+  let issues=0;
+  if(totalW>3000){ w1.className='wbox warn vis'; w1.textContent=`⚠ Total load ${totalW.toLocaleString()}W exceeds 3,000W max. Outlet 4 sheds first → 3 → 2 → 1.`; issues++; }
+  if(daytimeW>peakSol&&daytimeW>0){ w2.className='wbox warn vis'; w2.textContent=`⚠ Noon load ${daytimeW.toLocaleString()}W > solar ${peakSol.toLocaleString()}W. Add ${((daytimeW-peakSol)/1000).toFixed(1)} kW more panels or backup.`; issues++; }
+  const nightW=loads.filter(l=>loadIsOn(l,120)).reduce((s,l)=>s+l.w,0);
+  if(nightW>0&&!S.hasUPS&&!S.hasGen&&!S.hasGrid){ w2.className='wbox info vis'; w2.textContent=`ℹ ${nightW}W runs overnight. Add UPS/Generator/Grid to power those loads.`; issues++; }
+  if(issues===0&&loads.length>0){ const sp=(peakSol-daytimeW); wok.className='wbox ok vis'; wok.textContent=`✓ System ready! ${S.solarKw} kW covers ${daytimeW.toLocaleString()}W peak with ${(sp/1000).toFixed(1)} kW to spare.`; }
+  else if(loads.length===0){ wok.className='wbox info vis'; wok.textContent='Add equipment to outlets to see system analysis.'; }
+  // Also update SVG overlay banners
+  const wo1=document.getElementById('wo1'), wo2=document.getElementById('wo2');
+  if(wo1) wo1.style.display='none';
+  if(wo2) wo2.style.display='none';
+  if(totalW>3000&&wo1){ wo1.style.display='block'; wo1.innerHTML='⚠ <strong>Load exceeds VS3000 capacity</strong> — '+totalW.toLocaleString()+'W assigned &gt; 3,000W max.<br>Outlet 4 sheds first. Reduce loads or add a second VS3000.'; }
+  if(daytimeW>peakSol&&daytimeW>0&&wo2){ wo2.style.display='block'; wo2.innerHTML='☀ <strong>Solar undersized</strong> — '+daytimeW.toLocaleString()+'W peak load &gt; '+peakSol.toLocaleString()+'W solar.<br>Add '+((daytimeW-peakSol)/1000).toFixed(1)+' kW more panels or connect backup power.'; }
+  const nightW2=[1,2,3,4].reduce((s,o)=>s+outletLoads[o].reduce((a,l)=>a+l.w,0),0);
+  if(nightW2>0&&!S.hasUPS&&!S.hasGen&&!S.hasGrid&&wo2&&wo2.style.display==='none'){ wo2.style.display='block'; wo2.innerHTML='🌙 <strong>No backup connected</strong> — '+nightW2+'W of loads will lose power after dark.<br>Enable UPS, Generator, or Grid in the sidebar.'; }
+}
+
+// ═══ LOAD BOXES IN SVG ══════════════════════════════════
+// Outlet connection X on VS3000 left edge: x=294
+// Outlet connection Y: outlet 1→225, 2→265, 3→305, 4→345
+const OUTLET_SVG_Y={1:240,2:294,3:342,4:392};
+const LOAD_X=135; // X position of load boxes
+
+function renderAllLoadBoxes(){
+  const grp=document.getElementById('loads-grp');
+  grp.innerHTML='';
+  for(let o=1;o<=4;o++){
+    const loads=outletLoads[o];
+    const oy=OUTLET_SVG_Y[o];
+    // Update VS3000 slot label
+    const names=loads.slice(0,2).map(l=>l.name.substring(0,11)).join(' / ') || '—';
+    const sl=document.getElementById('s'+o+'load');
+    if(sl) sl.textContent=names.substring(0,16);
+    if(loads.length===0) continue;
+    // Stack boxes, spread evenly around outlet Y
+    const boxH=36, gap=5;
+    const totalH=loads.length*(boxH+gap)-gap;
+    loads.forEach((load,i)=>{
+      const y=oy - totalH/2 + i*(boxH+gap) + boxH/2;
+      // Box background
+      const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      rect.setAttribute('x',LOAD_X-50); rect.setAttribute('y',y-17);
+      rect.setAttribute('width',98); rect.setAttribute('height',32); rect.setAttribute('rx',5);
+      rect.setAttribute('class','obox'); rect.setAttribute('id','lb-'+load.id);
+      grp.appendChild(rect);
+      // Icon
+      const ico=document.createElementNS('http://www.w3.org/2000/svg','text');
+      ico.setAttribute('x',LOAD_X-40); ico.setAttribute('y',y+3);
+      ico.setAttribute('font-size','12'); ico.textContent=load.icon;
+      grp.appendChild(ico);
+      // Name
+      const nm=document.createElementNS('http://www.w3.org/2000/svg','text');
+      nm.setAttribute('x',LOAD_X-24); nm.setAttribute('y',y-5);
+      nm.setAttribute('font-family',"'Rajdhani',sans-serif"); nm.setAttribute('font-size','8');
+      nm.setAttribute('font-weight','700'); nm.setAttribute('fill','#8AAEC8');
+      nm.textContent=load.name.substring(0,13).toUpperCase();
+      grp.appendChild(nm);
+      // Watts
+      const wt=document.createElementNS('http://www.w3.org/2000/svg','text');
+      wt.setAttribute('x',LOAD_X-24); wt.setAttribute('y',y+8);
+      wt.setAttribute('font-family',"'Share Tech Mono',monospace"); wt.setAttribute('font-size','8');
+      wt.setAttribute('fill','#3D5A7A'); wt.setAttribute('id','lw-'+load.id);
+      wt.textContent=load.w+'W';
+      grp.appendChild(wt);
+    });
+  }
+}
+
+// ═══ LED STATE ══════════════════════════════════════════
+function setLED(o, state){ // 'solar'|'backup'|'waiting'|'off'
+  const led=document.getElementById('led'+o);
+  const bg=document.getElementById('slot'+o+'-bg');
+  const opLed=document.getElementById('op-led-'+o);
+  if(!led) return;
+  if(state==='solar'){
+    led.setAttribute('fill','#FF6B35'); led.setAttribute('class','led-solar');
+    if(bg) bg.setAttribute('stroke','rgba(255,107,53,.4)');
+    if(opLed){ opLed.className='op-led solar'; }
+  } else if(state==='backup'){
+    led.setAttribute('fill','#00E5A0'); led.setAttribute('class','');
+    if(bg) bg.setAttribute('stroke','rgba(0,229,160,.4)');
+    if(opLed){ opLed.className='op-led backup'; }
+  } else if(state==='waiting'){
+    led.setAttribute('fill','#FF6B35'); led.setAttribute('class','led-flash');
+    if(bg) bg.setAttribute('stroke','rgba(255,107,53,.2)');
+    if(opLed){ opLed.className='op-led wait'; }
+  } else {
+    led.setAttribute('fill','#1a2a3a'); led.setAttribute('class','');
+    if(bg) bg.setAttribute('stroke','#1a3050');
+    if(opLed){ opLed.className='op-led off'; }
+  }
+}
+
+// ═══ FUEL GAUGE ═════════════════════════════════════════
+function updateFuelGauge(surpW){
+  // 5 LEDs, fg1=bottom, fg5=top
+  // Per manual + spec:
+  // LED1 (bottom): solid RED  when >100W available
+  // LED2         : ORANGE     when >200W
+  // LED3         : ORANGE     when >300W
+  // LED4         : ORANGE→GREEN when >400W; GREEN when >500W
+  // LED5 (top)   : GREEN when 500-999W | WHITE when 1000-1999W
+  // 2000-2999W: LED5=WHITE, LED4=WHITE
+  // 3000+W    : LED5=WHITE, LED4=WHITE, LED3=WHITE
+  const OFF = '#0d1829';
+  const RED = '#FF4757', ORANGE = '#FF6B35', GREEN = '#00E5A0', WHITE = '#EDF2F7';
+
+  // Determine each LED color
+  let c1=OFF,c2=OFF,c3=OFF,c4=OFF,c5=OFF;
+
+  if(surpW >= 100)  c1 = RED;
+  if(surpW >= 200)  c2 = ORANGE;
+  if(surpW >= 300)  c3 = ORANGE;
+  if(surpW >= 400)  c4 = ORANGE;
+
+  // 500-999W: LED5 goes green, LED4 stays orange
+  if(surpW >= 500)  { c4 = ORANGE; c5 = GREEN; }
+
+  // 1000-1999W: LED5 turns white
+  if(surpW >= 1000) { c4 = GREEN;  c5 = WHITE; }
+
+  // 2000-2999W: LED4 also turns white
+  if(surpW >= 2000) { c4 = WHITE;  c5 = WHITE; }
+
+  // 3000+W: top 3 LEDs (fg3, fg4, fg5) all white
+  if(surpW >= 3000) { c3 = WHITE;  c4 = WHITE; c5 = WHITE; }
+
+  const vals=[c1,c2,c3,c4,c5];
+  for(let i=1;i<=5;i++){
+    const el=document.getElementById('fg'+i);
+    if(el) el.setAttribute('fill', vals[i-1]);
+  }
+}
+
+// ═══ MAIN TICK ══════════════════════════════════════════
+function tick(advance=true){
+  if(advance){ S.t=(S.t+S.speed)%1440; document.getElementById('tsl').value=S.t; }
+  const t=S.t, frac=solarFrac(t), sol=solarKw(t), isDay=sol>0.05;
+  const w1=getOutletW(1,t), w2=getOutletW(2,t), w3=getOutletW(3,t), w4=getOutletW(4,t);
+  const totalW=w1+w2+w3+w4;
+  const surpW=Math.max(0,sol*1000-totalW);
+  const hasBackup=S.hasUPS||S.hasGen||S.hasGrid;
+  const ow=[0,w1,w2,w3,w4];
+
+  // ── UPS SOC ────────────────────────────────────────────────────────
+  // Reset UPS to empty at dawn (t crosses 360 = 6am) so cycle repeats each day
+  if(S.hasUPS && advance && S.t >= 360 && (S.t - S.speed) < 360){
+    S.upsSoc = 0.0;
+  }
+  if(S.hasUPS){
+    if(surpW>100 && isDay){
+      // Charge from solar surplus — rate determined by charge rate setting
+      // chargeW watts into upsKwh battery: full charge in (upsKwh*1000/chargeW) hours
+      // Per sim-tick (1 min at 1x): rate = 1 / ((upsKwh*1000/chargeW)*60)
+      // Capped so charge rate can't exceed available surplus
+      const effectiveChargeW = Math.min(S.upsChargeW, surpW);
+      const chargeRate = (effectiveChargeW / 1000) / S.upsKwh / 60 * S.speed;
+      S.upsSoc = Math.min(1, S.upsSoc + chargeRate);
+      // Update estimated full-charge time label
+      const hoursToFull = ((1-S.upsSoc)*S.upsKwh*1000/effectiveChargeW);
+      const ctel = document.getElementById('ucr-time');
+      if(ctel && S.upsSoc<1) ctel.textContent = 'Full in ~'+hoursToFull.toFixed(1)+' hrs';
+      else if(ctel) ctel.textContent = '✓ Fully charged';
+    } else if(!isDay){
+      // Discharge overnight — drain based on ALL assigned loads (not just scheduled)
+      const nightLoad = [1,2,3,4].reduce((s,o)=>s+outletLoads[o].reduce((a,l)=>a+l.w,0),0);
+      if(nightLoad > 0){
+        // A 3 kWh UPS powering 400W of loads drains in ~7.5 hours
+        // Physics: (load_kW / capacity_kWh) / 60_min = fraction drained per minute
+        const drainRate = (nightLoad / 1000 / S.upsKwh / 60) * S.speed;
+        S.upsSoc = Math.max(0, S.upsSoc - drainRate);
+      }
+    }
+    const pct = Math.round(S.upsSoc * 100);
+    document.getElementById('ups-pct').textContent = pct + '%';
+    const bar = document.getElementById('ups-bar');
+    if(bar) bar.setAttribute('width', (pct * 0.88).toFixed(1));
+    document.getElementById('b-bat').textContent = pct + '%';
+    document.getElementById('b-bat').className = 'bv ' + (pct>50?'gr':pct>20?'':'rd');
+
+    // Mode label — what is the UPS doing right now
+    const modeEl = document.getElementById('ups-mode-lbl');
+    const nightLoadCheck = [1,2,3,4].reduce((s,o)=>s+outletLoads[o].reduce((a,l)=>a+l.w,0),0);
+    if(modeEl){
+      if(!isDay && nightLoadCheck>0 && pct>0) modeEl.textContent = '▼ Discharging — powering loads';
+      else if(!isDay && pct===0)              modeEl.textContent = '⚠ Depleted — no backup power';
+      else if(isDay && surpW>100)             modeEl.textContent = '▲ Charging from solar surplus';
+      else if(isDay && pct===100)             modeEl.textContent = '✓ Fully charged';
+      else                                     modeEl.textContent = '';
+    }
+
+    // UPS charging port label on VS3000 unit
+    const cl = document.getElementById('ups-chg-lbl');
+    if(cl) cl.textContent = surpW>200&&isDay ? '← Charging from solar' : '';
+
+  } else {
+    document.getElementById('b-bat').textContent = '—';
+    document.getElementById('b-bat').className = 'bv bl';
+  }
+
+  // Outlet states
+  // getOutletW uses schedule — but with backup, loads run 24/7.
+  // Recalculate: backup loads = all assigned watts regardless of schedule.
+  const backupW = (o) => outletLoads[o].reduce((s,l)=>s+l.w,0);
+
+  const outSt=['','','','',''];
+  let remSolar=sol*1000;
+  for(let o=1;o<=4;o++){
+    const dayW  = ow[o];       // scheduled watts (solar hours only)
+    const allW  = backupW(o);  // all assigned watts (for backup/night)
+
+    if(isDay){
+      // Daytime: use scheduled loads for solar. Unscheduled loads wait.
+      if(dayW===0){ outSt[o]='off'; continue; }
+      if(remSolar>=dayW){ outSt[o]='solar'; remSolar-=dayW; }
+      else if(hasBackup) outSt[o]='backup';
+      else outSt[o]='waiting';
+    } else {
+      // Night: backup only works if it has power
+      if(allW===0){ outSt[o]='off'; continue; }
+      const backupHasPower = (S.hasUPS && S.upsSoc>0) || S.hasGen || S.hasGrid;
+      if(backupHasPower) outSt[o]='backup';
+      else outSt[o]='waiting';  // flashing — depleted, waiting for sun
+    }
+  }
+
+  for(let o=1;o<=4;o++) setLED(o,outSt[o]);
+  updateFuelGauge(isDay?surpW:0);
+
+  // Outlet power lines
+  const lineFmt=(o)=>{
+    const ln=document.getElementById('ol'+o); if(!ln) return;
+    const st=outSt[o];
+    if(st==='solar'){ln.setAttribute('class','fline flow on');ln.setAttribute('stroke','#FF6B35');ln.setAttribute('marker-end','url(#ao)');}
+    else if(st==='backup'){
+      const bc=S.hasUPS?'#4A7FE8':S.hasGrid?'#FFD166':'#8AAEC8';
+      const mk=S.hasUPS?'url(#ab)':S.hasGrid?'url(#ay)':'url(#ag)';
+      ln.setAttribute('class','fline flow-slow on');ln.setAttribute('stroke',bc);ln.setAttribute('marker-end',mk);
+    } else { ln.setAttribute('class','fline');ln.setAttribute('marker-end',''); }
+  };
+  for(let o=1;o<=4;o++) lineFmt(o);
+
+  // Load box visual states — use outlet state (not schedule) so night backup shows
+  getAllActive().forEach(l=>{
+    const box=document.getElementById('lb-'+l.id); if(!box) return;
+    const st=outSt[l.outlet];
+    // Box is active if outlet has power (solar or backup), regardless of day/night schedule
+    if(st==='solar')   box.setAttribute('class','obox sol');
+    else if(st==='backup') box.setAttribute('class','obox bkp');
+    else if(st==='waiting') box.setAttribute('class','obox wait');
+    else box.setAttribute('class','obox off');
+  });
+
+  // Main flow lines
+  const sl=document.getElementById('ln-solar');
+  if(sl) sl.setAttribute('class',isDay?'fline flow on':'fline');
+  const nightHasLoad = [1,2,3,4].reduce((s,o)=>s+outletLoads[o].reduce((a,l)=>a+l.w,0),0) > 0;
+  const bl=document.getElementById('ln-ups'), gl=document.getElementById('ln-gen'), grl=document.getElementById('ln-grid');
+  if(bl) bl.setAttribute('class',S.hasUPS&&S.upsSoc>0&&!isDay&&nightHasLoad?'fline flow-slow on':'fline bkup');
+  if(gl) gl.setAttribute('class',S.hasGen&&!isDay&&nightHasLoad?'fline flow-slow on':'fline');
+  if(grl) grl.setAttribute('class',S.hasGrid&&!isDay&&nightHasLoad?'fline flow-slow on':'fline');
+  const chl=document.getElementById('ln-chg');
+  if(chl) chl.style.opacity=S.hasUPS&&surpW>200&&isDay?'0.85':'0';
+
+  // Gen/Grid status — use nightHasLoad (all assigned loads, not just scheduled)
+  if(S.hasGen){const r=!isDay&&nightHasLoad;document.getElementById('gen-st').textContent=r?'RUNNING':'Standby';document.getElementById('gen-st').setAttribute('fill',r?'#00E5A0':'#3D5A7A');}
+  if(S.hasGrid){const r=!isDay&&nightHasLoad;document.getElementById('grid-st').textContent=r?'Drawing':'Standby';document.getElementById('grid-st').setAttribute('fill',r?'#FFD166':'#3D5A7A');}
+
+  // Power LED
+  const pwrLed=document.getElementById('pwr-led');
+  if(pwrLed) pwrLed.setAttribute('fill',isDay||hasBackup?'#00E5A0':'#FF4757');
+
+  // ── SUN & MOON ORBIT ──────────────────────────────────
+  // Full 360° orbit. Map time 0-1440 min → angle -90° (top) going clockwise.
+  // Sun brightest at t=780 (1pm), angle=+90° (right side = NOON)
+  // Full orbit: angle = (t/1440)*2π - π/2  (starts at top=dawn position at t=360)
+  // Better: sun rises dawn(6am)→noon→dusk(8pm), then below horizon til dawn again
+  // We orbit fully: angle=((t-360)/1440)*2*PI - PI/2 — full continuous orbit
+  const PI=Math.PI;
+  // t=0=midnight(left), t=360=dawn(top), t=720=noon(right), t=1200=dusk(bottom)
+  const orbitAngle = ((t - 720) / 1440) * 2*PI;  // t=720 noon → 0 = right side (NOON label)
+  // Orbit params: cx=400,cy=310, rx=340,ry=275
+  const sx = 400 + 340*Math.cos(orbitAngle);
+  const sy = 310 + 275*Math.sin(orbitAngle);
+  // Moon is exactly opposite
+  const mx = 400 - 340*Math.cos(orbitAngle);
+  const my = 310 - 275*Math.sin(orbitAngle);
+
+  document.getElementById('sun-grp').setAttribute('transform',`translate(${sx.toFixed(1)},${sy.toFixed(1)})`);
+  document.getElementById('moon-grp').setAttribute('transform',`translate(${mx.toFixed(1)},${my.toFixed(1)})`);
+
+  // Sun visible when above horizon (y < orbit center y=310, i.e. top half)
+  // Midday = right side, midnight = left, dawn/dusk = top/bottom transitions
+  // Day: t=360(6am) to t=1200(8pm) → sun arc across top-right
+  // Night: t=1200(8pm) to t=360+1440(6am next day) → sun below, moon above
+  document.getElementById('sun-grp').style.opacity = isDay ? (0.45+0.55*frac).toFixed(2) : '0.1';
+  document.getElementById('moon-grp').style.opacity = isDay ? (frac<0.3?(0.3-frac).toFixed(2):'0') : '0.92';
+
+  document.getElementById('sun-circ').setAttribute('r',(13+9*frac).toFixed(1));
+  document.getElementById('sun-wlbl').textContent=isDay?(sol*1000).toFixed(0)+'W':'';
+  document.getElementById('sray-grp').style.opacity=frac>0.15?frac.toFixed(2):'0';
+  document.getElementById('panel-fill').setAttribute('fill',`rgba(255,107,53,${(0.02+frac*0.18).toFixed(2)})`);
+
+  // Source label
+  let srcLabel='—', srcColor='#3D5A7A';
+  if(isDay){ srcLabel='Solar Direct'; srcColor='#FF6B35'; }
+  else if(S.hasUPS&&S.upsSoc>0.05){ srcLabel='Battery'; srcColor='#4A7FE8'; }
+  else if(S.hasGen){ srcLabel='Generator'; srcColor='#8AAEC8'; }
+  else if(S.hasGrid){ srcLabel='Grid'; srcColor='#FFD166'; }
+
+  // Status pill
+  const pill=document.getElementById('mpill'), stxt=document.getElementById('mstt');
+  if(isDay&&sol>0.3){pill.className='spill solar';stxt.textContent='Solar Active';}
+  else if(!isDay&&hasBackup&&nightHasLoad){pill.className='spill backup';stxt.textContent=srcLabel;}
+  else if(!isDay){pill.className='spill night';stxt.textContent='Night Mode';}
+  else{pill.className='spill off';stxt.textContent='Low Solar';}
+
+  // Bottom stats — show actual running load (day=scheduled, night=all assigned)
+  const displayLoad = isDay ? totalW : [1,2,3,4].reduce((s,o)=>s+outletLoads[o].reduce((a,l)=>a+l.w,0),0);
+  document.getElementById('b-sol').textContent=sol.toFixed(2)+' kW';
+  document.getElementById('b-ld').textContent=displayLoad.toLocaleString()+' W';
+  const surp = isDay ? (sol - totalW/1000) : -displayLoad/1000;
+  document.getElementById('b-sur').textContent=Math.abs(surp).toFixed(2)+' kW';
+  document.getElementById('b-sur').className='bv '+(surp>0?'gr':surp<0?'rd':'gr');
+  document.getElementById('b-src').textContent=srcLabel;
+  document.getElementById('b-src').style.color=srcColor;
+
+  // Time display
+  const hh=Math.floor(t/60), mm=t%60, ap=hh>=12?'PM':'AM', h12=hh%12||12;
+  document.getElementById('tdsp').textContent=h12+':'+(mm+'').padStart(2,'0')+' '+ap;
+}
+
+// ═══ PLAY CONTROLS ══════════════════════════════════════
+let playInt=null;
+function togglePlay(){ S.playing=!S.playing; document.getElementById('pbtn').textContent=S.playing?'⏸ Pause':'▶ Play';
+  if(S.playing) playInt=setInterval(()=>tick(true),50); else clearInterval(playInt); }
+function setSpd(s,btn){ S.speed=s; document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); }
+document.getElementById('tsl').addEventListener('input',function(){ S.t=parseInt(this.value); tick(false); });
+
+// Clock
+function clkTick(){ const n=new Date(); document.getElementById('clk').textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); }
+setInterval(clkTick,1000); clkTick();
+
+// ═══ INIT ════════════════════════════════════════════════
+buildOutletPanels();
+onCfg();
+S.t=480; document.getElementById('tsl').value=480; tick(false);
+setTimeout(()=>togglePlay(),600);
+</script>
+</body>
+</html>
